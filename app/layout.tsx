@@ -1,29 +1,45 @@
-import { Geist, Geist_Mono, Inter } from "next/font/google"
-
-import "./globals.css"
+import { Geist_Mono, Inter } from "next/font/google"
+import { headers } from "next/headers"
 import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
+import ContextProvider from "@/context"
+import "./globals.css"
+import { Metadata } from "next"
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'})
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
 const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 })
 
-export default function RootLayout({
+export const metadata: Metadata = {
+  title: "DAO-App",
+  description: "Powered by Reown",
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const headerObject = await headers()
+  const cookies = headerObject.get("cookie")
   return (
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", inter.variable)}
+      className={cn(
+        "antialiased",
+        fontMono.variable,
+        "font-sans",
+        inter.variable
+      )}
     >
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <ContextProvider cookies={cookies}>{children}</ContextProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
