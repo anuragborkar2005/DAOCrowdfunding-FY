@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import ContextProvider from "@/context"
 import "./globals.css"
 import { Metadata } from "next"
+import { UserProvider } from "@/context/user-context"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -38,7 +39,9 @@ export default async function RootLayout({
     >
       <body>
         <ThemeProvider>
-          <ContextProvider cookies={cookies}>{children}</ContextProvider>
+          <UserProvider>
+            <ContextProvider cookies={cookies}>{children}</ContextProvider>
+          </UserProvider>
         </ThemeProvider>
       </body>
     </html>

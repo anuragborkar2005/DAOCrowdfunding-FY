@@ -32,6 +32,11 @@ const modal = createAppKit({
   features: {
     analytics: true, // Optional - defaults to your Cloud configuration
   },
+  themeVariables: {
+    "--apkt-font-family": "Inter",
+    "--apkt-accent": "#007a55",
+    "--apkt-border-radius-master": "5px",
+  },
 })
 
 function ContextProvider({

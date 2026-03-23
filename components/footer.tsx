@@ -90,7 +90,7 @@ export function Footer() {
                   <path d="M2 12l10 5 10-5" />
                 </svg>
               </div>
-              <span className="text-xl font-bold">FundChain</span>
+              <span className="text-xl font-bold">FundMitra</span>
             </Link>
             <p className="mt-4 max-w-xs text-sm text-muted-foreground">
               Transparent, decentralized crowdfunding powered by AI verification
@@ -178,7 +178,7 @@ export function Footer() {
 
         <div className="mt-12 border-t border-border pt-8">
           <p className="text-center text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} FundChain. All rights reserved.
+            &copy; {new Date().getFullYear()} FundMitra. All rights reserved.
             Built on blockchain for transparency.
           </p>
         </div>
