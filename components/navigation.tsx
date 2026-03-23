@@ -90,7 +90,7 @@ function WalletIcon() {
 const allNavItems = [
   { href: "/campaigns", label: "Explore", requiresAuth: false },
   {
-    href: "/create",
+    href: "/campaigns/create",
     label: "Start Campaign",
     requiresAuth: true,
     roles: ["creator", "admin"],

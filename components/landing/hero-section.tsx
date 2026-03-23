@@ -42,7 +42,7 @@ export function HeroSection() {
 
           {/* CTAs */}
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link href="/create">
+            <Link href="/campaigns/create">
               <Button size="lg" className="glow-primary min-w-[180px] gap-2">
                 <svg
                   className="h-5 w-5"

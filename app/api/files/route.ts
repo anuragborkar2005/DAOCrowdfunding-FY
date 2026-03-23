@@ -4,7 +4,7 @@ import { pinata } from "@/utils/config"
 export async function POST(request: NextRequest) {
   try {
     const data = await request.formData()
-    const files: File[] = data.getAll("file") as File[]
+    const files: File[] = data.getAll("documents") as File[]
 
     const results = await Promise.all(
       files.map(async (file) => {

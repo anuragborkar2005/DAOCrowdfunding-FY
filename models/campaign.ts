@@ -1,15 +1,15 @@
 import mongoose from "mongoose"
 
 const CampaignSchema = new mongoose.Schema({
-  id: {
-    type: String,
-    required: true,
-  },
   title: {
     type: String,
     required: true,
   },
   description: {
+    type: String,
+    required: true,
+  },
+  category: {
     type: String,
     required: true,
   },
@@ -26,4 +26,5 @@ const CampaignSchema = new mongoose.Schema({
   },
 })
 
-export const campaign = mongoose.model("campaign", CampaignSchema)
+export const campaign =
+  mongoose.models.campaign || mongoose.model("campaign", CampaignSchema)
