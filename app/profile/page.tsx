@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import Link from "next/link"
 import { Navigation } from "@/components/navigation"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
@@ -17,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useUser } from "@/context/user-context"
+import { useAccount } from "wagmi"
 import {
   CalendarIcon,
   CheckCircleIcon,
@@ -159,7 +161,31 @@ const achievements = [
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false)
-  const { userName } = useUser()
+  const { userName, userRole } = useUser()
+  const { address } = useAccount()
+  const [myCampaigns, setMyCampaigns] = useState([])
+  const [isFetching, setIsFetching] = useState(false)
+
+  useEffect(() => {
+    const fetchMyCampaigns = async () => {
+      if (address) {
+        setIsFetching(true)
+        try {
+          const res = await fetch(`/api/user/campaigns?address=${address}`)
+          if (res.ok) {
+            const data = await res.json()
+            setMyCampaigns(data.campaigns || [])
+          }
+        } catch (error) {
+          console.error("Error fetching my campaigns:", error)
+        } finally {
+          setIsFetching(false)
+        }
+      }
+    }
+
+    fetchMyCampaigns()
+  }, [address])
 
   return (
     <div className="min-h-screen bg-background">
@@ -174,9 +200,9 @@ export default function ProfilePage() {
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
                   <Avatar className="mb-4 h-24 w-24">
-                    <AvatarImage src="/placeholder.svg" />
+                    <AvatarImage src="/avatar-fallback.svg" />
                     <AvatarFallback className="bg-primary/20 text-2xl text-primary">
-                      {userName}
+                      {userName?.slice(0, 2).toUpperCase() || <UserIcon />}
                     </AvatarFallback>
                   </Avatar>
                   <h2 className="text-xl font-bold text-foreground">
@@ -274,6 +300,9 @@ export default function ProfilePage() {
             <Tabs defaultValue="donations" className="space-y-6">
               <TabsList className="bg-muted/50 p-1">
                 <TabsTrigger value="donations">My Donations</TabsTrigger>
+                {userRole === "DAO Member" && (
+                  <TabsTrigger value="campaigns">My Campaigns</TabsTrigger>
+                )}
                 <TabsTrigger value="votes">Voting History</TabsTrigger>
                 <TabsTrigger value="settings">Settings</TabsTrigger>
               </TabsList>
@@ -330,6 +359,69 @@ export default function ProfilePage() {
                   </CardContent>
                 </Card>
               </TabsContent>
+
+              {userRole === "DAO Member" && (
+                <TabsContent value="campaigns" className="space-y-4">
+                  <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                    <CardHeader>
+                      <CardTitle>My Deployed Campaigns</CardTitle>
+                      <CardDescription>
+                        Manage and track your fundraising efforts
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {isFetching ? (
+                          <div className="py-8 text-center text-muted-foreground">
+                            Loading campaigns...
+                          </div>
+                        ) : myCampaigns.length === 0 ? (
+                          <div className="py-8 text-center text-muted-foreground">
+                            You haven't deployed any campaigns yet.
+                          </div>
+                        ) : (
+                          myCampaigns.map((camp: any) => (
+                            <div
+                              key={camp._id}
+                              className="flex items-center justify-between rounded-lg border border-border/50 bg-muted/30 p-4"
+                            >
+                              <div className="flex items-center gap-4">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/20">
+                                  <TrendUpIcon className="h-5 w-5 text-primary" />
+                                </div>
+                                <div>
+                                  <p className="font-medium">{camp.title}</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    Target: ${camp.amount}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <Badge
+                                  variant={
+                                    camp.status === "active"
+                                      ? "default"
+                                      : "secondary"
+                                  }
+                                  className="text-xs"
+                                >
+                                  {camp.status}
+                                </Badge>
+                                <Link
+                                  href={`/campaigns/${camp._id}`}
+                                  className="mt-2 block text-xs text-primary hover:underline"
+                                >
+                                  View Details
+                                </Link>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              )}
 
               <TabsContent value="votes" className="space-y-4">
                 <Card className="border-border/50 bg-card/50 backdrop-blur-sm">

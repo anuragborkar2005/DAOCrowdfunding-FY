@@ -22,6 +22,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useConnection, useWriteContract } from "wagmi"
+import { ABIS } from "@/lib/contracts/abis"
+import { CONTRACT_ADDRESSES } from "@/lib/contracts/addresses"
 
 const categories = [
   "Medical",
@@ -45,6 +48,8 @@ export default function CreateCampaignPage() {
     description: "",
     documents: [] as File[],
   })
+  const { writeContract } = useWriteContract()
+  const { address } = useConnection()
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -110,13 +115,21 @@ export default function CreateCampaignPage() {
           description: formData.description,
           category: formData.category,
           amount: formData.goal,
-          urls: uploadedUrls, // include uploaded file URLs
+          urls: uploadedUrls,
+          creatorAddress: address,
         }),
       })
 
       if (res.ok) {
-        const data = await res.json()
-        console.log("Campaign submitted successfully:", data)
+        const { campaign } = await res.json()
+        writeContract({
+          abi: ABIS.CampaignFactory,
+          address: CONTRACT_ADDRESSES.CampaignFactory,
+          functionName: "createCampaign",
+          args: [CONTRACT_ADDRESSES.MockUSDC, campaign._id, 92],
+        })
+        // In a production app, we would wait for the receipt and then call the PATCH API
+        // For now, we move to success step
         setCurrentStep(3)
       } else {
         console.error(

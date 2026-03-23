@@ -4,9 +4,17 @@ import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(request: NextRequest) {
   try {
-    const { title, description, category, amount, urls } = await request.json()
+    const { title, description, category, amount, urls, creatorAddress } =
+      await request.json()
 
-    if (!title || !description || !category || !amount || !urls) {
+    if (
+      !title ||
+      !description ||
+      !category ||
+      !amount ||
+      !urls ||
+      !creatorAddress
+    ) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -21,6 +29,8 @@ export async function POST(request: NextRequest) {
       category,
       amount,
       documentsCid: urls,
+      creatorAddress: creatorAddress.toLowerCase(),
+      status: "pending",
     })
 
     return NextResponse.json(

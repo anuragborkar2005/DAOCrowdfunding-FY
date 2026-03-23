@@ -15,7 +15,7 @@ const fontMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "DAO-App",
+  title: "FundMitra",
   description: "Powered by Reown",
 }
 

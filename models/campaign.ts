@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+import { MilestoneSchema } from "./milestone"
 
 const CampaignSchema = new mongoose.Schema({
   title: {
@@ -20,9 +21,31 @@ const CampaignSchema = new mongoose.Schema({
   documentsCid: {
     type: [String],
   },
+  creatorAddress: {
+    type: String,
+    required: true,
+    index: true,
+  },
+  contractAddress: {
+    type: String,
+    sparse: true,
+    unique: true,
+  },
+  escrowAddress: {
+    type: String,
+  },
+  status: {
+    type: String,
+    enum: ["pending", "active", "failed"],
+    default: "pending",
+  },
+  milestone: {
+    type: [MilestoneSchema],
+    default: [],
+  },
   createdAt: {
     type: Date,
-    default: Date.now(),
+    default: Date.now,
   },
 })
 

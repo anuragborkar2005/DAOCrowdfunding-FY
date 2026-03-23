@@ -6,7 +6,7 @@ import { CONTRACT_ADDRESSES } from "@/lib/contracts/addresses"
 import { ABIS } from "@/lib/contracts/abis"
 import { useDisconnect } from "@reown/appkit/react"
 
-export type UserRole = "donor" | "creator" | "dao_member" | "admin"
+export type UserRole = "Donor" | "DAO Member" | "Admin"
 
 interface UserContextType {
   userRole: UserRole | null
@@ -55,17 +55,17 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
     // 1. Check if Admin
     if (ADMIN_ADDRESSES.includes(userAddr)) {
-      setUserRole("admin")
+      setUserRole("Admin")
       setUserName("Admin User")
     }
     // 2. Check if DAO Member (has tokens)
     else if (tokenBalance && (tokenBalance as bigint) > 0n) {
-      setUserRole("dao_member")
+      setUserRole("DAO Member")
       setUserName(address.slice(0, 6) + "...")
     }
     // 3. Default to Donor
     else {
-      setUserRole("donor")
+      setUserRole("Donor")
       setUserName(address.slice(0, 6) + "...")
     }
 

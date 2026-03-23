@@ -16,7 +16,7 @@ import {
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { useUser } from "@/context/user-context"
 import { DonationModal } from "@/components/modals/donation-modal"
@@ -26,8 +26,8 @@ const campaign = {
   id: "1",
   title: "Emergency Heart Surgery for Maria",
   category: "Medical",
-  description: `Maria is a bright 12-year-old girl who loves school and dreams of becoming a doctor. 
-  
+  description: `Maria is a bright 12-year-old girl who loves school and dreams of becoming a doctor.
+
 Last month, she was diagnosed with a congenital heart defect that requires immediate surgical intervention. Without this surgery, her condition will worsen significantly.
 
 Her family, despite working multiple jobs, cannot afford the $60,000 needed for the operation and post-operative care. Maria's parents have exhausted their savings and are reaching out to the community for help.
@@ -273,7 +273,7 @@ export default function CampaignDetailPage() {
   const presetAmounts = [25, 50, 100, 250, 500, 1000]
 
   // Only DAO members can see AI Trust Score
-  const canSeeTrustScore = userRole === "dao_member"
+  const canSeeTrustScore = userRole === "DAO Member"
 
   return (
     <div className="min-h-screen">
@@ -323,6 +323,7 @@ export default function CampaignDetailPage() {
               </h1>
               <div className="mt-4 flex items-center gap-3">
                 <Avatar>
+                  <AvatarImage src="/avatar-fallback.svg" />
                   <AvatarFallback className="bg-primary/10 text-primary">
                     {campaign.creator.avatar}
                   </AvatarFallback>
@@ -438,6 +439,7 @@ export default function CampaignDetailPage() {
                     >
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
+                          <AvatarImage src="/avatar-fallback.svg" />
                           <AvatarFallback className="text-xs">
                             {donor.name === "Anonymous"
                               ? "?"
@@ -464,7 +466,7 @@ export default function CampaignDetailPage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Donation Card */}
-            <Card className="sticky top-24 border-border/50 bg-card/50">
+            <Card className="top-24 border-border/50 bg-card/50">
               <CardHeader>
                 <div className="space-y-4">
                   <div>

@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { AppKitButton } from "@reown/appkit/react"
 import ConnectButton from "./ui/connect-button"
@@ -93,13 +94,13 @@ const allNavItems = [
     href: "/campaigns/create",
     label: "Start Campaign",
     requiresAuth: true,
-    roles: ["creator", "admin"],
+    roles: ["Donor", "Admin"],
   },
   {
     href: "/dao",
     label: "DAO Voting",
     requiresAuth: true,
-    roles: ["dao_member", "admin"],
+    roles: ["DAO Memberr", "Admin"],
   },
   { href: "/transparency", label: "Transparency", requiresAuth: true },
 ]
@@ -135,24 +136,25 @@ export function Navigation() {
         <div className="flex items-center gap-8">
           <Logo />
           <nav className="hidden items-center gap-1 md:flex">
-            {!isLoading && visibleNavItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
-                  pathname === item.href
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground"
-                )}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {!isLoading &&
+              visibleNavItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
+                    pathname === item.href
+                      ? "bg-accent text-accent-foreground"
+                      : "text-muted-foreground"
+                  )}
+                >
+                  {item.label}
+                </Link>
+              ))}
             {isLoading && (
               <div className="flex gap-4 px-3 py-2">
-                 <div className="h-4 w-20 animate-pulse rounded bg-muted"></div>
-                 <div className="h-4 w-20 animate-pulse rounded bg-muted"></div>
+                <div className="h-4 w-20 animate-pulse rounded bg-muted"></div>
+                <div className="h-4 w-20 animate-pulse rounded bg-muted"></div>
               </div>
             )}
           </nav>
@@ -163,7 +165,12 @@ export function Navigation() {
 
           <div className="hidden items-center gap-2 sm:flex">
             {isLoading ? (
-              <Button variant="outline" size="sm" disabled className="animate-pulse">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled
+                className="animate-pulse"
+              >
                 Detecting Role...
               </Button>
             ) : userRole ? (
@@ -176,8 +183,16 @@ export function Navigation() {
                 <DropdownMenu>
                   <DropdownMenuTrigger
                     render={
-                      <Button size="sm" variant="outline">
-                        {userName} ({userRole.replace("_", " ")})
+                      <Button size="sm" variant="outline" className="gap-2 px-2">
+                        <Avatar size="sm">
+                          <AvatarImage src="/avatar-fallback.svg" />
+                          <AvatarFallback>
+                            {userName?.slice(0, 2).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="hidden sm:inline-block">
+                          {userName} ({userRole.replace("_", " ")})
+                        </span>
                       </Button>
                     }
                   ></DropdownMenuTrigger>
@@ -185,7 +200,7 @@ export function Navigation() {
                     <DropdownMenuItem
                       render={<Link href="/profile">Profile</Link>}
                     ></DropdownMenuItem>
-                    {userRole === "dao_member" && (
+                    {userRole === "DAO Member" && (
                       <DropdownMenuItem
                         render={
                           <Link href="/dao-verification">DAO Verification</Link>
