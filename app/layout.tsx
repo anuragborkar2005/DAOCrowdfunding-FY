@@ -39,9 +39,9 @@ export default async function RootLayout({
     >
       <body>
         <ThemeProvider>
-          <UserProvider>
-            <ContextProvider cookies={cookies}>{children}</ContextProvider>
-          </UserProvider>
+          <ContextProvider cookies={cookies}>
+            <UserProvider>{children}</UserProvider>
+          </ContextProvider>
         </ThemeProvider>
       </body>
     </html>

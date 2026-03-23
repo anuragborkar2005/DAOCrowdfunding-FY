@@ -107,7 +107,7 @@ const allNavItems = [
 export function Navigation() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = React.useState(false)
-  const { userRole, userName, logout } = useUser()
+  const { userRole, userName, isLoading, logout } = useUser()
 
   // Filter navigation items based on authentication and role
   const getVisibleNavItems = () => {
@@ -115,6 +115,7 @@ export function Navigation() {
       if (!item.requiresAuth) {
         return true // Always show items that don't require auth
       }
+      if (isLoading) return false // Hide while loading to prevent flicker
       if (!userRole) {
         return false // Hide auth-required items when not signed in
       }
@@ -134,7 +135,7 @@ export function Navigation() {
         <div className="flex items-center gap-8">
           <Logo />
           <nav className="hidden items-center gap-1 md:flex">
-            {visibleNavItems.map((item) => (
+            {!isLoading && visibleNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -148,6 +149,12 @@ export function Navigation() {
                 {item.label}
               </Link>
             ))}
+            {isLoading && (
+              <div className="flex gap-4 px-3 py-2">
+                 <div className="h-4 w-20 animate-pulse rounded bg-muted"></div>
+                 <div className="h-4 w-20 animate-pulse rounded bg-muted"></div>
+              </div>
+            )}
           </nav>
         </div>
 
@@ -155,7 +162,11 @@ export function Navigation() {
           <ThemeToggle />
 
           <div className="hidden items-center gap-2 sm:flex">
-            {userRole ? (
+            {isLoading ? (
+              <Button variant="outline" size="sm" disabled className="animate-pulse">
+                Detecting Role...
+              </Button>
+            ) : userRole ? (
               <div className="flex items-center gap-2">
                 <Link href="/dashboard">
                   <Button variant="ghost" size="sm">
