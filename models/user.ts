@@ -1,18 +1,33 @@
-import mongoose from "mongoose"
+import mongoose, { Model, Document, Schema } from "mongoose"
 
-const UserSchema = new mongoose.Schema({
-  address: {
-    type: `0x${String}`,
-    required: true,
-  },
-  role: {
-    type: String,
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-})
+export interface IUser extends Document {
+  wallet: string
+  username?: string
+  bio?: string
+  profilePicCID?: string
+  createdAt: Date
+  lastActive: Date
+  totalDonated?: number
+}
 
-export const user = mongoose.models.user || mongoose.model("user", UserSchema)
+const UserSchema = new Schema<IUser>(
+  {
+    wallet: {
+      type: String,
+      required: true,
+      lowercase: true,
+      unique: true,
+      index: true,
+    },
+    username: { type: String, sparse: true, unique: true },
+    bio: { type: String },
+    profilePicCID: { type: String },
+    createdAt: { type: Date, default: Date.now },
+    lastActive: { type: Date, default: Date.now },
+    totalDonated: { type: Number, default: 0 },
+  },
+  { timestamps: true }
+)
+
+export const User: Model<IUser> =
+  mongoose.models.User || mongoose.model<IUser>("User", UserSchema)
