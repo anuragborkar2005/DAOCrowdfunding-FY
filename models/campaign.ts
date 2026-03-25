@@ -1,10 +1,11 @@
 import mongoose, { Model, Document, Schema } from "mongoose"
 
 export interface ICampaign extends Document {
-  onChainAddress: string
+  onChainAddress?: string
   creator: string
   title: string
   description: string
+  category?: string
   metadataCID: string
   goalAmount: string // string to avoid precision issues (wei / token units)
   tokenAddress: string
@@ -14,19 +15,21 @@ export interface ICampaign extends Document {
   createdAt: Date
   launchedAt?: Date
   slug?: string
+  proposalId?: string // Link to the DAOGovernor proposal
 }
 
 const CampaignSchema = new Schema<ICampaign>(
   {
     onChainAddress: {
       type: String,
-      required: true,
       unique: true,
       lowercase: true,
+      sparse: true,
     },
     creator: { type: String, required: true, lowercase: true, index: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
+    category: { type: String },
     metadataCID: { type: String, required: true },
     goalAmount: { type: String, required: true },
     tokenAddress: { type: String, required: true, lowercase: true },
@@ -41,12 +44,13 @@ const CampaignSchema = new Schema<ICampaign>(
     createdAt: { type: Date, default: Date.now },
     launchedAt: { type: Date },
     slug: { type: String, sparse: true, unique: true },
+    proposalId: { type: String },
   },
   { timestamps: true }
 )
 
 CampaignSchema.index({ status: 1, createdAt: -1 })
-CampaignSchema.index({ slug: 1 })
+// CampaignSchema.index({ slug: 1 })
 
 export const Campaign: Model<ICampaign> =
   mongoose.models.Campaign ||

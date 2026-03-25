@@ -1,7 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect } from "react"
-import { useConnection, useReadContract } from "wagmi"
+import { useAccount, useReadContract } from "wagmi"
 import { CONTRACT_ADDRESSES } from "@/lib/contracts/addresses"
 import { ABIS } from "@/lib/contracts/abis"
 import { useDisconnect } from "@reown/appkit/react"
@@ -25,14 +25,25 @@ const ADMIN_ADDRESSES = ["0xab12d2c3edece57e3c32307fa5f660d042161169"].map(
 )
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const { address, isConnected } = useConnection()
+  const { address, isConnected } = useAccount()
   const { disconnect } = useDisconnect()
   const [userRole, setUserRole] = useState<UserRole | null>(null)
   const [userName, setUserName] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
-  // Check Governance Token balance to determine if user is a DAO member
-  const { data: tokenBalance, isLoading: isTokenLoading } = useReadContract({
+  // Check Voting Power to determine if user is a DAO member
+  const { data: votingPower, isLoading: isVotesLoading } = useReadContract({
+    address: CONTRACT_ADDRESSES.GovernanceToken as `0x${string}`,
+    abi: ABIS.GovernanceToken,
+    functionName: "getVotes",
+    args: address ? [address] : undefined,
+    query: {
+      enabled: !!address,
+    },
+  })
+
+  // Also check Token Balance so that users who delegated their power are still DAO Members
+  const { data: tokenBalance, isLoading: isBalanceLoading } = useReadContract({
     address: CONTRACT_ADDRESSES.GovernanceToken as `0x${string}`,
     abi: ABIS.GovernanceToken,
     functionName: "balanceOf",
@@ -58,8 +69,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       setUserRole("Admin")
       setUserName("Admin User")
     }
-    // 2. Check if DAO Member (has tokens)
-    else if (tokenBalance && (tokenBalance as bigint) > 0n) {
+    // 2. Check if DAO Member (has active voting power OR holds tokens)
+    else if (
+      (votingPower && (votingPower as bigint) > 0n) ||
+      (tokenBalance && (tokenBalance as bigint) > 0n)
+    ) {
       setUserRole("DAO Member")
       setUserName(address.slice(0, 6) + "...")
     }
@@ -70,7 +84,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
 
     setIsLoading(false)
-  }, [address, isConnected, tokenBalance])
+  }, [address, isConnected, votingPower, tokenBalance])
 
   const logout = () => {
     setUserRole(null)
@@ -85,7 +99,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         setUserRole,
         userName,
         setUserName,
-        isLoading: isLoading || isTokenLoading,
+        isLoading: isLoading || isVotesLoading || isBalanceLoading,
         logout,
       }}
     >

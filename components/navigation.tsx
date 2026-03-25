@@ -100,7 +100,7 @@ const allNavItems = [
     href: "/dao",
     label: "DAO Voting",
     requiresAuth: true,
-    roles: ["DAO Memberr", "Admin"],
+    roles: ["DAO Member", "Admin"],
   },
   { href: "/transparency", label: "Transparency", requiresAuth: true },
 ]
@@ -183,7 +183,11 @@ export function Navigation() {
                 <DropdownMenu>
                   <DropdownMenuTrigger
                     render={
-                      <Button size="sm" variant="outline" className="gap-2 px-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="gap-2 px-2"
+                      >
                         <Avatar size="sm">
                           <AvatarImage src="/avatar-fallback.svg" />
                           <AvatarFallback>
@@ -210,7 +214,7 @@ export function Navigation() {
                     <DropdownMenuItem
                       onClick={() => {
                         logout()
-                        window.location.href = "/auth"
+                        window.location.href = "/"
                       }}
                       className="text-destructive"
                     >

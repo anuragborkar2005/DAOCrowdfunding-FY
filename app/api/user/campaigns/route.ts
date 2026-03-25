@@ -1,30 +1,27 @@
+import { NextResponse } from "next/server"
+import { Campaign } from "@/models/campaign"
 import dbConnect from "@/lib/db/connect"
-import { campaign } from "@/models/campaign"
-import { NextRequest, NextResponse } from "next/server"
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
+  await dbConnect()
+
+  const { searchParams } = new URL(request.url)
+  const address = searchParams.get("address")?.toLowerCase()
+
+  if (!address) {
+    return NextResponse.json({ error: "Missing address" }, { status: 400 })
+  }
+
   try {
-    const { searchParams } = new URL(request.url)
-    const address = searchParams.get("address")
+    const campaigns = await Campaign.find({ creator: address })
+      .sort({ createdAt: -1 })
+      .lean()
 
-    if (!address) {
-      return NextResponse.json({ error: "Address is required" }, { status: 400 })
-    }
-
-    await dbConnect()
-
-    const userCampaigns = await campaign.find({
-      creatorAddress: address.toLowerCase()
-    }).sort({ createdAt: -1 })
-
+    return NextResponse.json({ campaigns })
+  } catch (error) {
+    console.error(error)
     return NextResponse.json(
-      { message: "Success", campaigns: userCampaigns },
-      { status: 200 }
-    )
-  } catch (e) {
-    console.error(e)
-    return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Failed to fetch user campaigns" },
       { status: 500 }
     )
   }

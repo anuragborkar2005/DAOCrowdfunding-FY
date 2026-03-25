@@ -1,46 +1,57 @@
+import { NextResponse } from "next/server"
+import { pinJSONToIPFS } from "@/lib/pinata" // your Pinata helper
+import { Campaign } from "@/models/campaign"
 import dbConnect from "@/lib/db/connect"
-import { campaign } from "@/models/campaign"
-import { NextRequest, NextResponse } from "next/server"
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
+  await dbConnect()
+
   try {
-    const { title, description, category, amount, urls, creatorAddress } =
-      await request.json()
+    const body = await request.json()
+    const { title, description, goalAmount, tokenAddress, creator, category } = body
 
-    if (
-      !title ||
-      !description ||
-      !category ||
-      !amount ||
-      !urls ||
-      !creatorAddress
-    ) {
+    if (!title || !description || !goalAmount || !creator) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       )
     }
 
-    await dbConnect()
+    // Upload metadata to Pinata
+    const metadata = {
+      title,
+      description,
+      goalAmount,
+      tokenAddress,
+      creator,
+      category,
+      version: "1.0",
+      created: new Date().toISOString(),
+    }
 
-    const newCampaign = await campaign.create({
+    const cid = await pinJSONToIPFS(metadata)
+
+    // Temporary DB entry (optimistic – onChainAddress added later by indexer)
+    const tempCampaign = await Campaign.create({
+      creator: creator.toLowerCase(),
       title,
       description,
       category,
-      amount,
-      documentsCid: urls,
-      creatorAddress: creatorAddress.toLowerCase(),
+      metadataCID: cid,
+      goalAmount: goalAmount.toString(),
+      tokenAddress: tokenAddress.toLowerCase(),
       status: "pending",
     })
 
+    return NextResponse.json({
+      cid,
+      campaign: tempCampaign,
+      message: "Metadata uploaded & DB record created – now call createCampaign on-chain",
+    })
+  } catch (error) {
+    console.error(error)
     return NextResponse.json(
-      { message: "Success", campaign: newCampaign },
-      { status: 200 }
-    )
-  } catch (e) {
-    console.error(e)
-    return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Failed to create campaign metadata" },
       { status: 500 }
     )
   }
